@@ -288,6 +288,16 @@ export default class Table {
         this._staged[seat] = true
     }
 
+    addOn(seat: SeatIndex, amount: Chips): void {
+        assert(!this.handInProgress(), 'Hand must not be in progress')
+        assert(seat < this._numSeats && seat >= 0, 'Given seat index must be valid')
+        const player = this._tablePlayers[seat]
+        assert(player !== null, 'Given seat must be occupied')
+        assert(amount > 0, 'Amount must be greater than 0')
+
+        player.addToStack(amount)
+    }
+
     standUp(seat: SeatIndex): void {
         assert(seat < this._numSeats && seat >= 0, 'Given seat index must be valid')
         assert(this._tablePlayers[seat] !== null, 'Given seat must be occupied')

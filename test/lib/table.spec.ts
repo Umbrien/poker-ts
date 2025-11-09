@@ -49,6 +49,16 @@ describe('Table', () => {
                 test('that seat is taken', () => {
                     expect(table.seats()[7]).not.toBeNull()
                 })
+
+                describe('that player adds on', () => {
+                    beforeEach(() => {
+                        table.addOn(7, 500)
+                    })
+
+                    test('the player has more chips', () => {
+                        expect(table.seats()[7]?.stack()).toBe(1500)
+                    })
+                })
             })
         })
 
