@@ -242,6 +242,14 @@ var Table = /** @class */ (function () {
         this._tablePlayers[seat] = new player_1.default(buyIn);
         this._staged[seat] = true;
     };
+    Table.prototype.addOn = function (seat, amount) {
+        assert_1.default(!this.handInProgress(), 'Hand must not be in progress');
+        assert_1.default(seat < this._numSeats && seat >= 0, 'Given seat index must be valid');
+        var player = this._tablePlayers[seat];
+        assert_1.default(player !== null, 'Given seat must be occupied');
+        assert_1.default(amount > 0, 'Amount must be greater than 0');
+        player.addToStack(amount);
+    };
     Table.prototype.standUp = function (seat) {
         assert_1.default(seat < this._numSeats && seat >= 0, 'Given seat index must be valid');
         assert_1.default(this._tablePlayers[seat] !== null, 'Given seat must be occupied');

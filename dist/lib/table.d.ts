@@ -55,6 +55,7 @@ export default class Table {
     legalAutomaticActions(seat: SeatIndex): AutomaticAction;
     setAutomaticAction(seat: SeatIndex, action: AutomaticAction | null): void;
     sitDown(seat: SeatIndex, buyIn: Chips): void;
+    addOn(seat: SeatIndex, amount: Chips): void;
     standUp(seat: SeatIndex): void;
     private takeAutomaticAction;
     private amendAutomaticActions;
