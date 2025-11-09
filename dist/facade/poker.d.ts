@@ -66,5 +66,6 @@ export default class Poker {
     legalAutomaticActions(seatIndex: number): AutomaticAction[];
     setAutomaticAction(seatIndex: number, action: AutomaticAction | null): void;
     sitDown(seatIndex: number, buyIn: number): void;
+    addOn(seatIndex: number, amount: number): void;
     standUp(seatIndex: number): void;
 }

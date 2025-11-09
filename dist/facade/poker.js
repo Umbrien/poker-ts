@@ -202,6 +202,9 @@ var Poker = /** @class */ (function () {
     Poker.prototype.sitDown = function (seatIndex, buyIn) {
         this._table.sitDown(seatIndex, buyIn);
     };
+    Poker.prototype.addOn = function (seatIndex, amount) {
+        this._table.addOn(seatIndex, amount);
+    };
     Poker.prototype.standUp = function (seatIndex) {
         this._table.standUp(seatIndex);
     };

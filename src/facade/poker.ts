@@ -217,6 +217,10 @@ export default class Poker {
         this._table.sitDown(seatIndex, buyIn)
     }
 
+    addOn(seatIndex: number, amount: number): void {
+        this._table.addOn(seatIndex, amount)
+    }
+
     standUp(seatIndex: number): void {
         this._table.standUp(seatIndex)
     }
