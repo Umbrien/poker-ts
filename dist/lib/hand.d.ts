@@ -1,6 +1,7 @@
 import Card, { CardRank } from './card';
 import CommunityCards from './community-cards';
 import { HoleCards } from 'types/hole-cards';
+import { Serializable } from 'types/serializable';
 export declare enum HandRanking {
     HIGH_CARD = 0,
     PAIR = 1,
@@ -17,7 +18,12 @@ export declare type RankInfo = {
     rank: CardRank;
     count: number;
 };
-export default class Hand {
+declare type HandState = {
+    _ranking: HandRanking;
+    _strength: number;
+    _cards: ReturnType<Card['toJSON']>[];
+};
+export default class Hand implements Serializable<HandState> {
     private readonly _ranking;
     private readonly _strength;
     private readonly _cards;
@@ -34,4 +40,6 @@ export default class Hand {
     ranking(): HandRanking;
     strength(): number;
     cards(): Card[];
+    toJSON(): HandState;
 }
+export {};

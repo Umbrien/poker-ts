@@ -13,6 +13,8 @@ import Pot from './pot'
 import Hand from './hand'
 import { findIndexAdjacent, nextOrWrap } from '../util/array'
 import Card from './card'
+import { Serializable } from 'types/serializable'
+import Player from './player'
 
 export class ActionRange {
     action: Action = Action.FOLD // You can always fold
@@ -38,7 +40,22 @@ export enum Action {
     RAISE = 1 << 4
 }
 
-export default class Dealer {
+type DealerState = {
+    _button: SeatIndex
+    _communityCards: ReturnType<CommunityCards['toJSON']>
+    _holeCards: (ReturnType<Card['toJSON']>[] | null)[]
+    _players: (ReturnType<Player['toJSON']> | null)[]
+    _bettingRound: ReturnType<BettingRound['toJSON']> | null
+    _forcedBets: ForcedBets
+    _deck: ReturnType<Deck['toJSON']>
+    _handInProgress: boolean
+    _roundOfBetting: RoundOfBetting
+    _bettingRoundsCompleted: boolean
+    _potManager: ReturnType<PotManager['toJSON']>
+    _winners: [SeatIndex, ReturnType<Hand['toJSON']>, ReturnType<Card['toJSON']>[]][][]
+}
+
+export default class Dealer implements Serializable<DealerState> {
     private readonly _button: SeatIndex = 0
     private readonly _communityCards: CommunityCards
     private readonly _holeCards: HoleCards[]
@@ -303,6 +320,31 @@ export default class Dealer {
                     oddChips--
                 }
             }
+        }
+    }
+
+    toJSON(): DealerState {
+        return {
+            _button: this._button,
+            _communityCards: this._communityCards.toJSON(),
+            _holeCards: this._holeCards.map(cards => cards?.map(card => card.toJSON()) ?? null),
+            _players: this._players.map(player => player?.toJSON() ?? null),
+            _bettingRound: this._bettingRound?.toJSON() ?? null,
+            _forcedBets: this._forcedBets,
+            _deck: this._deck.toJSON(),
+            _handInProgress: this._handInProgress,
+            _roundOfBetting: this._roundOfBetting,
+            _bettingRoundsCompleted: this._bettingRoundsCompleted,
+            _potManager: this._potManager.toJSON(),
+            _winners: this._winners.map(potWinners => {
+                return potWinners.map(([seatIndex, hand, holeCards]) => {
+                    return [
+                        seatIndex,
+                        hand.toJSON(),
+                        holeCards.map(card => card.toJSON()),
+                    ]
+                })
+            }),
         }
     }
 

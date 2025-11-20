@@ -1,8 +1,12 @@
 import Card from './card';
-export default class Deck extends Array<Card> {
-    private readonly shuffle;
-    private _size;
+import { Serializable } from 'types/serializable';
+declare type DeckState = (ReturnType<Card['toJSON']>)[];
+export default class Deck extends Array<Card> implements Serializable<DeckState> {
+    private readonly shuffleAlgorithm;
+    static get [Symbol.species](): ArrayConstructor;
     constructor(shuffleAlgorithm?: (array: Card[]) => void);
     fillAndShuffle(): void;
     draw(): Card;
+    toJSON(): DeckState;
 }
+export {};

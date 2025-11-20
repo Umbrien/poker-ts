@@ -1,5 +1,10 @@
 import { Chips } from 'types/chips';
-export default class Player {
+import { Serializable } from 'types/serializable';
+declare type PlayerState = {
+    _total: Chips;
+    _betSize: Chips;
+};
+export default class Player implements Serializable<PlayerState> {
     private _total;
     private _betSize;
     constructor(arg: Chips | Player);
@@ -10,4 +15,6 @@ export default class Player {
     takeFromStack(amount: Chips): void;
     bet(amount: Chips): void;
     takeFromBet(amount: Chips): void;
+    toJSON(): PlayerState;
 }
+export {};

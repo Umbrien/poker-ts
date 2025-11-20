@@ -254,6 +254,13 @@ var Hand = /** @class */ (function () {
     Hand.prototype.cards = function () {
         return this._cards;
     };
+    Hand.prototype.toJSON = function () {
+        return {
+            _ranking: this._ranking,
+            _strength: this._strength,
+            _cards: this._cards.map(function (card) { return card.toJSON(); }),
+        };
+    };
     return Hand;
 }());
 exports.default = Hand;

@@ -3,6 +3,7 @@ import Card, { CardRank } from './card'
 import { findIndexAdjacent, findMax, rotate, unique } from '../util/array'
 import CommunityCards from './community-cards'
 import { HoleCards } from 'types/hole-cards'
+import { Serializable } from 'types/serializable'
 
 export enum HandRanking {
     HIGH_CARD,
@@ -22,7 +23,13 @@ export type RankInfo = {
     count: number,
 }
 
-export default class Hand {
+type HandState = {
+    _ranking: HandRanking
+    _strength: number
+    _cards: ReturnType<Card['toJSON']>[]
+}
+
+export default class Hand implements Serializable<HandState> {
     private readonly _ranking: HandRanking
     private readonly _strength: number
     private readonly _cards: Card[] /* size 5 */
@@ -252,5 +259,13 @@ export default class Hand {
 
     cards(): Card[] {
         return this._cards
+    }
+
+    toJSON(): HandState {
+        return {
+            _ranking: this._ranking,
+            _strength: this._strength,
+            _cards: this._cards.map(card => card.toJSON()),
+        }
     }
 }

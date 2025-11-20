@@ -45,6 +45,12 @@ var Player = /** @class */ (function () {
         this._total -= amount;
         this._betSize -= amount;
     };
+    Player.prototype.toJSON = function () {
+        return {
+            _total: this._total,
+            _betSize: this._betSize,
+        };
+    };
     return Player;
 }());
 exports.default = Player;

@@ -1,5 +1,6 @@
 import assert from 'assert';
 import { SeatIndex } from 'types/seat-index';
+import { Serializable } from 'types/serializable';
 
 export enum Action {
     LEAVE = 1 << 0,
@@ -7,7 +8,16 @@ export enum Action {
     AGGRESSIVE = 1 << 2,
 }
 
-export default class Round {
+type RoundState = {
+    _activePlayers: boolean[];
+    _playerToAct: SeatIndex;
+    _lastAggressiveActor: SeatIndex;
+    _contested: boolean;
+    _firstAction: boolean;
+    _numActivePlayers: number;
+}
+
+export default class Round implements Serializable<RoundState> {
     private readonly _activePlayers: boolean[]
     private _playerToAct: SeatIndex
     private _lastAggressiveActor: SeatIndex
@@ -70,6 +80,17 @@ export default class Round {
         }
 
         this.incrementPlayer();
+    }
+
+    toJSON(): RoundState {
+        return {
+            _activePlayers: this._activePlayers,
+            _playerToAct: this._playerToAct,
+            _lastAggressiveActor: this._lastAggressiveActor,
+            _contested: this._contested,
+            _firstAction: this._firstAction,
+            _numActivePlayers: this._numActivePlayers,
+        }
     }
 
     private incrementPlayer(): void {

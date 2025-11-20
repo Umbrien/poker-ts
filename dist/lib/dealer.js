@@ -306,6 +306,32 @@ var Dealer = /** @class */ (function () {
             _loop_1(pot);
         }
     };
+    Dealer.prototype.toJSON = function () {
+        var _a, _b;
+        return {
+            _button: this._button,
+            _communityCards: this._communityCards.toJSON(),
+            _holeCards: this._holeCards.map(function (cards) { var _a; return (_a = cards === null || cards === void 0 ? void 0 : cards.map(function (card) { return card.toJSON(); })) !== null && _a !== void 0 ? _a : null; }),
+            _players: this._players.map(function (player) { var _a; return (_a = player === null || player === void 0 ? void 0 : player.toJSON()) !== null && _a !== void 0 ? _a : null; }),
+            _bettingRound: (_b = (_a = this._bettingRound) === null || _a === void 0 ? void 0 : _a.toJSON()) !== null && _b !== void 0 ? _b : null,
+            _forcedBets: this._forcedBets,
+            _deck: this._deck.toJSON(),
+            _handInProgress: this._handInProgress,
+            _roundOfBetting: this._roundOfBetting,
+            _bettingRoundsCompleted: this._bettingRoundsCompleted,
+            _potManager: this._potManager.toJSON(),
+            _winners: this._winners.map(function (potWinners) {
+                return potWinners.map(function (_a) {
+                    var seatIndex = _a[0], hand = _a[1], holeCards = _a[2];
+                    return [
+                        seatIndex,
+                        hand.toJSON(),
+                        holeCards.map(function (card) { return card.toJSON(); }),
+                    ];
+                });
+            }),
+        };
+    };
     Dealer.prototype.nextOrWrap = function (seat) {
         return array_1.nextOrWrap(this._players, seat);
     };

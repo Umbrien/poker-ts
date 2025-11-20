@@ -32,6 +32,11 @@ var CommunityCards = /** @class */ (function () {
         assert_1.default(cards.length <= 5 - this._cards.length, 'Cannot deal more than there is undealt cards');
         this._cards = this._cards.concat(cards);
     };
+    CommunityCards.prototype.toJSON = function () {
+        return {
+            _cards: this._cards.map(function (card) { return card.toJSON(); }),
+        };
+    };
     return CommunityCards;
 }());
 exports.default = CommunityCards;

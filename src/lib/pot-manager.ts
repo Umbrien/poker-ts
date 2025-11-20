@@ -1,8 +1,14 @@
 import Pot from './pot'
 import { Chips } from 'types/chips'
 import { SeatArray } from 'types/seat-array'
+import { Serializable } from 'types/serializable'
 
-export default class PotManager {
+type PotManagerState = {
+    _pots: ReturnType<Pot['toJSON']>[]
+    _aggregateFoldedBets: Chips
+}
+
+export default class PotManager implements Serializable<PotManagerState> {
     private readonly _pots: Pot[]
     private _aggregateFoldedBets: Chips = 0
 
@@ -40,6 +46,13 @@ export default class PotManager {
             }
 
             break;
+        }
+    }
+
+    toJSON(): PotManagerState {
+        return {
+            _pots: this._pots.map(pot => pot.toJSON()),
+            _aggregateFoldedBets: this._aggregateFoldedBets,
         }
     }
 }

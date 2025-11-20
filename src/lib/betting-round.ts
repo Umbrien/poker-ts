@@ -4,6 +4,8 @@ import { SeatIndex } from 'types/seat-index'
 import { Chips } from 'types/chips'
 import Round, { Action as RoundAction } from './round'
 import { SeatArray } from 'types/seat-array'
+import Player from './player'
+import { Serializable } from 'types/serializable'
 
 export enum Action {
     LEAVE,
@@ -21,7 +23,14 @@ export class ActionRange {
     }
 }
 
-export default class BettingRound {
+type BettingRoundState = {
+    _players: (ReturnType<Player['toJSON']> | null)[]
+    _round: ReturnType<Round['toJSON']>
+    _biggestBet: Chips
+    _minRaise: Chips
+}
+
+export default class BettingRound implements Serializable<BettingRoundState> {
     private readonly _players: SeatArray
     private _round: Round
     private _biggestBet: Chips
@@ -108,6 +117,15 @@ export default class BettingRound {
         } else {
             assert(action === Action.LEAVE)
             this._round.actionTaken(RoundAction.LEAVE)
+        }
+    }
+
+    toJSON(): BettingRoundState {
+        return {
+            _players: this._players.map(player => player?.toJSON() ?? null),
+            _round: this._round.toJSON(),
+            _biggestBet: this._biggestBet,
+            _minRaise: this._minRaise,
         }
     }
 

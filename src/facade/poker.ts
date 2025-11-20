@@ -6,6 +6,7 @@ import { Action as ActionFlag } from '../lib/dealer'
 import ChipRange from '../lib/chip-range'
 import { SeatIndex } from 'types/seat-index'
 import { HandRanking } from '../lib/hand'
+import { Serializable } from 'types/serializable'
 
 export type Card = {
     rank: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'T' | 'J' | 'Q' | 'K' | 'A'
@@ -69,7 +70,11 @@ const stringToAutomaticActionFlag = (automaticAction: AutomaticAction): Automati
     }
 }
 
-export default class Poker {
+type PokerState = {
+    _table: ReturnType<Table['toJSON']>
+}
+
+export default class Poker implements Serializable<PokerState> {
     private _table: Table
 
     constructor(forcedBets: { ante?: number, bigBlind: number, smallBlind: number }, numSeats?: number) {
@@ -223,5 +228,11 @@ export default class Poker {
 
     standUp(seatIndex: number): void {
         this._table.standUp(seatIndex)
+    }
+
+    toJSON(): PokerState {
+        return {
+            _table: this._table.toJSON(),
+        }
     }
 }

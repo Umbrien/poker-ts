@@ -1,13 +1,18 @@
+import Table from '../lib/table';
 import ChipRange from '../lib/chip-range';
 import { SeatIndex } from 'types/seat-index';
 import { HandRanking } from '../lib/hand';
+import { Serializable } from 'types/serializable';
 export declare type Card = {
     rank: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'T' | 'J' | 'Q' | 'K' | 'A';
     suit: 'clubs' | 'diamonds' | 'hearts' | 'spades';
 };
 export declare type AutomaticAction = 'fold' | 'check/fold' | 'check' | 'call' | 'call any' | 'all-in';
 export declare type Action = 'fold' | 'check' | 'call' | 'bet' | 'raise';
-export default class Poker {
+declare type PokerState = {
+    _table: ReturnType<Table['toJSON']>;
+};
+export default class Poker implements Serializable<PokerState> {
     private _table;
     constructor(forcedBets: {
         ante?: number;
@@ -68,4 +73,6 @@ export default class Poker {
     sitDown(seatIndex: number, buyIn: number): void;
     addOn(seatIndex: number, amount: number): void;
     standUp(seatIndex: number): void;
+    toJSON(): PokerState;
 }
+export {};

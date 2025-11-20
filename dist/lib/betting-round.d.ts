@@ -1,7 +1,10 @@
 import ChipRange from './chip-range';
 import { SeatIndex } from 'types/seat-index';
 import { Chips } from 'types/chips';
+import Round from './round';
 import { SeatArray } from 'types/seat-array';
+import Player from './player';
+import { Serializable } from 'types/serializable';
 export declare enum Action {
     LEAVE = 0,
     MATCH = 1,
@@ -12,7 +15,13 @@ export declare class ActionRange {
     chipRange: ChipRange;
     constructor(canRaise: boolean, chipRange?: ChipRange);
 }
-export default class BettingRound {
+declare type BettingRoundState = {
+    _players: (ReturnType<Player['toJSON']> | null)[];
+    _round: ReturnType<Round['toJSON']>;
+    _biggestBet: Chips;
+    _minRaise: Chips;
+};
+export default class BettingRound implements Serializable<BettingRoundState> {
     private readonly _players;
     private _round;
     private _biggestBet;
@@ -28,5 +37,7 @@ export default class BettingRound {
     numActivePlayers(): number;
     legalActions(): ActionRange;
     actionTaken(action: Action, bet?: Chips): void;
+    toJSON(): BettingRoundState;
     private isRaiseValid;
 }
+export {};

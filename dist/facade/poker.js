@@ -208,6 +208,11 @@ var Poker = /** @class */ (function () {
     Poker.prototype.standUp = function (seatIndex) {
         this._table.standUp(seatIndex);
     };
+    Poker.prototype.toJSON = function () {
+        return {
+            _table: this._table.toJSON(),
+        };
+    };
     return Poker;
 }());
 exports.default = Poker;

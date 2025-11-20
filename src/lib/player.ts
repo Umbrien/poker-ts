@@ -1,8 +1,14 @@
 import assert from 'assert';
 import { Chips } from 'types/chips';
-import { isChips } from '../type-guards/chips'
+import { isChips } from '../type-guards/chips';
+import { Serializable } from 'types/serializable';
 
-export default class Player {
+type PlayerState = {
+    _total: Chips;
+    _betSize: Chips;
+}
+
+export default class Player implements Serializable<PlayerState> {
     private _total: Chips = 0
     private _betSize: Chips = 0
 
@@ -48,6 +54,13 @@ export default class Player {
         assert(amount <= this._betSize, 'Cannot take from bet more than is there')
         this._total -= amount
         this._betSize -= amount
+    }
+
+    toJSON(): PlayerState {
+        return {
+            _total: this._total,
+            _betSize: this._betSize,
+        }
     }
 }
 

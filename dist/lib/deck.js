@@ -48,24 +48,35 @@ var Deck = /** @class */ (function (_super) {
         // Set the prototype explicitly when extending Array
         // See https://github.com/Microsoft/TypeScript/wiki/FAQ#why-doesnt-extending-built-ins-like-error-array-and-map-work
         Object.setPrototypeOf(_this, Deck.prototype);
-        var index = 0;
-        for (var suit = card_1.CardSuit.CLUBS; suit <= card_1.CardSuit.SPADES; suit++) {
-            for (var rank = card_1.CardRank._2; rank <= card_1.CardRank.A; rank++) {
-                _this[index++] = new card_1.default(rank, suit);
-            }
-        }
-        _this.shuffle = shuffleAlgorithm.bind(null, _this);
-        _this._size = 52;
-        _this.shuffle();
+        _this.shuffleAlgorithm = shuffleAlgorithm;
+        _this.fillAndShuffle();
         return _this;
     }
+    Object.defineProperty(Deck, Symbol.species, {
+        get: function () {
+            return Array;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Deck.prototype.fillAndShuffle = function () {
-        this._size = 52;
-        this.shuffle();
+        // Reset the array
+        this.length = 0;
+        // Regenerate cards
+        for (var suit = card_1.CardSuit.CLUBS; suit <= card_1.CardSuit.SPADES; suit++) {
+            for (var rank = card_1.CardRank._2; rank <= card_1.CardRank.A; rank++) {
+                this.push(new card_1.default(rank, suit));
+            }
+        }
+        // Apply shuffle
+        this.shuffleAlgorithm(this);
     };
     Deck.prototype.draw = function () {
-        assert_1.default(this._size > 0, 'Cannot draw from an empty deck');
-        return this[--this._size];
+        assert_1.default(this.length > 0, 'Cannot draw from an empty deck');
+        return this.pop();
+    };
+    Deck.prototype.toJSON = function () {
+        return this.map(function (card) { return card.toJSON(); });
     };
     return Deck;
 }(Array));

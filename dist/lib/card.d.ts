@@ -1,3 +1,4 @@
+import { Serializable } from 'types/serializable';
 export declare enum CardRank {
     _2 = 0,
     _3 = 1,
@@ -19,9 +20,15 @@ export declare enum CardSuit {
     HEARTS = 2,
     SPADES = 3
 }
-export default class Card {
+declare type CardState = {
+    rank: CardRank;
+    suit: CardSuit;
+};
+export default class Card implements Serializable<CardState> {
     rank: CardRank;
     suit: CardSuit;
     static compare(c1: Card, c2: Card): number;
     constructor(rank: CardRank, suit: CardSuit);
+    toJSON(): CardState;
 }
+export {};

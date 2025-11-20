@@ -1,4 +1,5 @@
 import Card from "./card";
+import { Serializable } from 'types/serializable';
 export declare enum RoundOfBetting {
     PREFLOP = 0,
     FLOP = 3,
@@ -6,8 +7,13 @@ export declare enum RoundOfBetting {
     RIVER = 5
 }
 export declare const next: (roundOfBetting: RoundOfBetting) => RoundOfBetting;
-export default class CommunityCards {
+declare type CommunityCardsState = {
+    _cards: (ReturnType<Card['toJSON']>)[];
+};
+export default class CommunityCards implements Serializable<CommunityCardsState> {
     private _cards;
     cards(): Card[];
     deal(cards: Card[]): void;
+    toJSON(): CommunityCardsState;
 }
+export {};

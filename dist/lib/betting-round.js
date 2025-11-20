@@ -120,6 +120,14 @@ var BettingRound = /** @class */ (function () {
             this._round.actionTaken(round_1.Action.LEAVE);
         }
     };
+    BettingRound.prototype.toJSON = function () {
+        return {
+            _players: this._players.map(function (player) { var _a; return (_a = player === null || player === void 0 ? void 0 : player.toJSON()) !== null && _a !== void 0 ? _a : null; }),
+            _round: this._round.toJSON(),
+            _biggestBet: this._biggestBet,
+            _minRaise: this._minRaise,
+        };
+    };
     BettingRound.prototype.isRaiseValid = function (bet) {
         var player = this._players[this._round.playerToAct()];
         assert_1.default(player !== null);

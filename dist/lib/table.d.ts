@@ -1,12 +1,15 @@
 import { SeatArray } from 'types/seat-array';
 import { SeatIndex } from 'types/seat-index';
 import { ForcedBets } from 'types/forced-bets';
+import Deck from './deck';
 import CommunityCards, { RoundOfBetting } from './community-cards';
-import { Action, ActionRange } from './dealer';
+import Dealer, { Action, ActionRange } from './dealer';
 import Pot from './pot';
 import { HoleCards } from 'types/hole-cards';
 import { Chips } from 'types/chips';
+import Player from './player';
 import Hand from './hand';
+import { Serializable } from 'types/serializable';
 export declare enum AutomaticAction {
     FOLD = 1,
     CHECK_FOLD = 2,
@@ -15,7 +18,21 @@ export declare enum AutomaticAction {
     CALL_ANY = 16,
     ALL_IN = 32
 }
-export default class Table {
+declare type TableState = {
+    _numSeats: number;
+    _tablePlayers: (ReturnType<Player['toJSON']> | null)[];
+    _deck: ReturnType<Deck['toJSON']>;
+    _handPlayers?: (ReturnType<Player['toJSON']> | null)[];
+    _automaticActions?: (AutomaticAction | null)[];
+    _firstTimeButton: boolean;
+    _buttonSetManually: boolean;
+    _button: SeatIndex;
+    _forcedBets: ForcedBets;
+    _communityCards?: ReturnType<CommunityCards['toJSON']>;
+    _dealer?: ReturnType<Dealer['toJSON']>;
+    _staged: boolean[];
+};
+export default class Table implements Serializable<TableState> {
     private readonly _numSeats;
     private readonly _tablePlayers;
     private readonly _deck;
@@ -57,6 +74,7 @@ export default class Table {
     sitDown(seat: SeatIndex, buyIn: Chips): void;
     addOn(seat: SeatIndex, amount: Chips): void;
     standUp(seat: SeatIndex): void;
+    toJSON(): TableState;
     private takeAutomaticAction;
     private amendAutomaticActions;
     private actPassively;
@@ -66,3 +84,4 @@ export default class Table {
     private singleActivePlayerRemaining;
     private standUpBustedPlayers;
 }
+export {};

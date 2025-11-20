@@ -55,6 +55,12 @@ var Pot = /** @class */ (function () {
             return minBet_1;
         }
     };
+    Pot.prototype.toJSON = function () {
+        return {
+            _eligiblePlayers: this._eligiblePlayers,
+            _size: this._size,
+        };
+    };
     return Pot;
 }());
 exports.default = Pot;

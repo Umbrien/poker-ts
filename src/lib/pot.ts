@@ -3,8 +3,14 @@ import { SeatIndex } from 'types/seat-index'
 import { Chips } from 'types/chips'
 import { SeatArray } from 'types/seat-array'
 import Player from './player'
+import { Serializable } from 'types/serializable'
 
-export default class Pot {
+type PotState = {
+    _eligiblePlayers: SeatIndex[]
+    _size: Chips
+}
+
+export default class Pot implements Serializable<PotState> {
     private _eligiblePlayers: SeatIndex[] = []
     private _size: Chips = 0
 
@@ -54,6 +60,13 @@ export default class Pot {
             })
 
             return minBet;
+        }
+    }
+
+    toJSON(): PotState {
+        return {
+            _eligiblePlayers: this._eligiblePlayers,
+            _size: this._size,
         }
     }
 }

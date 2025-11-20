@@ -1,10 +1,19 @@
 import { SeatIndex } from 'types/seat-index';
+import { Serializable } from 'types/serializable';
 export declare enum Action {
     LEAVE = 1,
     PASSIVE = 2,
     AGGRESSIVE = 4
 }
-export default class Round {
+declare type RoundState = {
+    _activePlayers: boolean[];
+    _playerToAct: SeatIndex;
+    _lastAggressiveActor: SeatIndex;
+    _contested: boolean;
+    _firstAction: boolean;
+    _numActivePlayers: number;
+};
+export default class Round implements Serializable<RoundState> {
     private readonly _activePlayers;
     private _playerToAct;
     private _lastAggressiveActor;
@@ -19,5 +28,7 @@ export default class Round {
     inProgress(): boolean;
     isContested(): boolean;
     actionTaken(action: Action): void;
+    toJSON(): RoundState;
     private incrementPlayer;
 }
+export {};

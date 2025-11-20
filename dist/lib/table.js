@@ -275,6 +275,23 @@ var Table = /** @class */ (function () {
             this._tablePlayers[seat] = null;
         }
     };
+    Table.prototype.toJSON = function () {
+        var _a, _b, _c;
+        return {
+            _numSeats: this._numSeats,
+            _tablePlayers: this._tablePlayers.map(function (player) { var _a; return (_a = player === null || player === void 0 ? void 0 : player.toJSON()) !== null && _a !== void 0 ? _a : null; }),
+            _deck: this._deck.toJSON(),
+            _handPlayers: (_a = this._handPlayers) === null || _a === void 0 ? void 0 : _a.map(function (player) { var _a; return (_a = player === null || player === void 0 ? void 0 : player.toJSON()) !== null && _a !== void 0 ? _a : null; }),
+            _automaticActions: this._automaticActions,
+            _firstTimeButton: this._firstTimeButton,
+            _buttonSetManually: this._buttonSetManually,
+            _button: this._button,
+            _forcedBets: this._forcedBets,
+            _communityCards: (_b = this._communityCards) === null || _b === void 0 ? void 0 : _b.toJSON(),
+            _dealer: (_c = this._dealer) === null || _c === void 0 ? void 0 : _c.toJSON(),
+            _staged: this._staged,
+        };
+    };
     Table.prototype.takeAutomaticAction = function (automaticAction) {
         assert_1.default(this._dealer !== undefined);
         assert_1.default(this._handPlayers !== undefined);

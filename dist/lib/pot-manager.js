@@ -37,6 +37,12 @@ var PotManager = /** @class */ (function () {
             break;
         }
     };
+    PotManager.prototype.toJSON = function () {
+        return {
+            _pots: this._pots.map(function (pot) { return pot.toJSON(); }),
+            _aggregateFoldedBets: this._aggregateFoldedBets,
+        };
+    };
     return PotManager;
 }());
 exports.default = PotManager;

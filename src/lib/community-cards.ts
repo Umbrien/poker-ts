@@ -1,5 +1,6 @@
 import assert from 'assert';
 import Card from "./card";
+import { Serializable } from 'types/serializable';
 
 export enum RoundOfBetting {
     PREFLOP = 0,
@@ -16,7 +17,11 @@ export const next = (roundOfBetting: RoundOfBetting): RoundOfBetting => {
     }
 }
 
-export default class CommunityCards {
+type CommunityCardsState = {
+    _cards: (ReturnType<Card['toJSON']>)[]
+}
+
+export default class CommunityCards implements Serializable<CommunityCardsState> {
     private _cards: Card[] = []
 
     cards(): Card[] {
@@ -26,5 +31,11 @@ export default class CommunityCards {
     deal(cards: Card[]): void {
         assert(cards.length <= 5 - this._cards.length, 'Cannot deal more than there is undealt cards')
         this._cards = this._cards.concat(cards)
+    }
+
+    toJSON(): CommunityCardsState {
+        return {
+            _cards: this._cards.map(card => card.toJSON()),
+        }
     }
 }

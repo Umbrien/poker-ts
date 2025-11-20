@@ -11,6 +11,7 @@ import { Chips } from 'types/chips'
 import { bitCount } from '../util/bit'
 import Player from './player'
 import Hand from './hand'
+import { Serializable } from 'types/serializable'
 
 export enum AutomaticAction {
     FOLD = 1 << 0,
@@ -21,7 +22,22 @@ export enum AutomaticAction {
     ALL_IN = 1 << 5
 }
 
-export default class Table {
+type TableState = {
+    _numSeats: number
+    _tablePlayers: (ReturnType<Player['toJSON']> | null)[]
+    _deck: ReturnType<Deck['toJSON']>
+    _handPlayers?: (ReturnType<Player['toJSON']> | null)[]
+    _automaticActions?: (AutomaticAction | null)[]
+    _firstTimeButton: boolean
+    _buttonSetManually: boolean
+    _button: SeatIndex
+    _forcedBets: ForcedBets
+    _communityCards?: ReturnType<CommunityCards['toJSON']>
+    _dealer?: ReturnType<Dealer['toJSON']>
+    _staged: boolean[]
+}
+
+export default class Table implements Serializable<TableState> {
     private readonly _numSeats: number
     private readonly _tablePlayers: SeatArray // All the players physically present at the table
     private readonly _deck: Deck
@@ -321,6 +337,23 @@ export default class Table {
             }
         } else {
             this._tablePlayers[seat] = null
+        }
+    }
+
+    toJSON(): TableState {
+        return {
+            _numSeats: this._numSeats,
+            _tablePlayers: this._tablePlayers.map(player => player?.toJSON() ?? null),
+            _deck: this._deck.toJSON(),
+            _handPlayers: this._handPlayers?.map(player => player?.toJSON() ?? null),
+            _automaticActions: this._automaticActions,
+            _firstTimeButton: this._firstTimeButton,
+            _buttonSetManually: this._buttonSetManually,
+            _button: this._button,
+            _forcedBets: this._forcedBets,
+            _communityCards: this._communityCards?.toJSON(),
+            _dealer: this._dealer?.toJSON(),
+            _staged: this._staged,
         }
     }
 

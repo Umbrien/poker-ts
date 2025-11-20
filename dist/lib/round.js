@@ -60,6 +60,16 @@ var Round = /** @class */ (function () {
         }
         this.incrementPlayer();
     };
+    Round.prototype.toJSON = function () {
+        return {
+            _activePlayers: this._activePlayers,
+            _playerToAct: this._playerToAct,
+            _lastAggressiveActor: this._lastAggressiveActor,
+            _contested: this._contested,
+            _firstAction: this._firstAction,
+            _numActivePlayers: this._numActivePlayers,
+        };
+    };
     Round.prototype.incrementPlayer = function () {
         do {
             ++this._playerToAct;
