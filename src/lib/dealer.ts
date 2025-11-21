@@ -52,7 +52,7 @@ type DealerState = {
     _roundOfBetting: RoundOfBetting
     _bettingRoundsCompleted: boolean
     _potManager: ReturnType<PotManager['toJSON']>
-    _winners: [SeatIndex, ReturnType<Hand['toJSON']>, ReturnType<Card['toJSON']>[]][][]
+    _winners: [SeatIndex, ReturnType<Hand['toJSON']>, [ReturnType<Card['toJSON']>, ReturnType<Card['toJSON']>]][][]
 }
 
 export default class Dealer implements Serializable<DealerState> {
@@ -69,7 +69,29 @@ export default class Dealer implements Serializable<DealerState> {
     private _potManager: PotManager
     private _winners: [SeatIndex, Hand, HoleCards][][]
 
-    constructor(players: SeatArray, button: SeatIndex, forcedBets: ForcedBets, deck: Deck, communityCards: CommunityCards, numSeats: number = 9) {
+    static fromJSON(json: DealerState): Dealer {
+        const players = json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
+        const deck = Deck.fromJSON(json._deck);
+        const communityCards = CommunityCards.fromJSON(json._communityCards);
+        const dealer = new Dealer(players, json._button, json._forcedBets, deck, communityCards, json._holeCards.length, true);
+
+        (dealer._holeCards as (ReturnType<Card['toJSON']>[] | null)[]) = json._holeCards.map(holeCardsState => 
+            holeCardsState ? holeCardsState.map(cardState => Card.fromJSON(cardState)) : null
+        );
+        dealer._bettingRound = json._bettingRound ? BettingRound.fromJSON(json._bettingRound) : null;
+        dealer._handInProgress = json._handInProgress;
+        dealer._roundOfBetting = json._roundOfBetting;
+        dealer._bettingRoundsCompleted = json._bettingRoundsCompleted;
+        (dealer._potManager as PotManager) = PotManager.fromJSON(json._potManager);
+        dealer._winners = json._winners.map(potWinners => 
+            potWinners.map(([seatIndex, handState, holeCardsStates]) => 
+                [seatIndex, Hand.fromJSON(handState), [Card.fromJSON(holeCardsStates[0]), Card.fromJSON(holeCardsStates[1])] as HoleCards]
+            )
+        );
+        return dealer;
+    }
+
+    constructor(players: SeatArray, button: SeatIndex, forcedBets: ForcedBets, deck: Deck, communityCards: CommunityCards, numSeats: number = 9, deserializing: boolean = false) {
         this._players = players
         this._button = button
         this._forcedBets = forcedBets
@@ -79,8 +101,10 @@ export default class Dealer implements Serializable<DealerState> {
         this._holeCards = new Array(numSeats).fill(null)
         this._winners = []
 
-        assert(deck.length === 52, 'Deck must be whole')
-        assert(communityCards.cards().length === 0, 'No community cards should have been dealt')
+        if (!deserializing) {
+            assert(deck.length === 52, 'Deck must be whole')
+            assert(communityCards.cards().length === 0, 'No community cards should have been dealt')
+        }
     }
 
     static isValid(action: Action): boolean {
@@ -341,7 +365,7 @@ export default class Dealer implements Serializable<DealerState> {
                     return [
                         seatIndex,
                         hand.toJSON(),
-                        holeCards.map(card => card.toJSON()),
+                        holeCards.map(card => card.toJSON()) as [ReturnType<Card['toJSON']>, ReturnType<Card['toJSON']>],
                     ]
                 })
             }),

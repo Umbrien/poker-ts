@@ -204,4 +204,64 @@ describe('Betting round', () => {
             })
         })
     })
-})
+
+    test('toJSON should serialize the betting round correctly', () => {
+        const players: SeatArray = [new Player(100), new Player(200), null, new Player(300)];
+        const bettingRound = new BettingRound(players, 0, 10, 20); // firstToAct = 0, minRaise = 10, biggestBet = 20
+        bettingRound.actionTaken(BettingRoundAction.MATCH); // Player 0 calls 20
+
+        const json = bettingRound.toJSON();
+
+        expect(json).toHaveProperty('_players');
+        expect(Array.isArray(json._players)).toBe(true);
+        expect(json._players.length).toBe(4);
+        expect(json._players[0]).toEqual({ _total: 100, _betSize: 20 });
+        expect(json._players[1]).toEqual({ _total: 200, _betSize: 0 });
+        expect(json._players[2]).toBeNull();
+        expect(json._players[3]).toEqual({ _total: 300, _betSize: 0 });
+        expect(json).toHaveProperty('_round');
+        expect(json._round).toHaveProperty('_activePlayers');
+        expect(json).toHaveProperty('_biggestBet', 20);
+        expect(json).toHaveProperty('_minRaise', 10);
+    });
+
+    test('fromJSON should deserialize the betting round correctly', () => {
+        const bettingRoundState = {
+            _players: [
+                { _total: 100, _betSize: 20 },
+                { _total: 200, _betSize: 0 },
+                null,
+                { _total: 300, _betSize: 0 },
+            ],
+            _round: {
+                _activePlayers: [true, true, false, true],
+                _playerToAct: 1, // Player 1 is the next player to act after Player 0 matched
+                _lastAggressiveActor: 0,
+                _contested: true,
+                _firstAction: false,
+                _numActivePlayers: 3,
+            },
+            _biggestBet: 20,
+            _minRaise: 10,
+        };
+        const bettingRound = BettingRound.fromJSON(bettingRoundState);
+
+        expect(bettingRound).toBeInstanceOf(BettingRound);
+        expect(bettingRound.biggestBet()).toBe(20);
+        expect(bettingRound.minRaise()).toBe(10);
+        expect(bettingRound.playerToAct()).toBe(bettingRoundState._round._playerToAct);
+
+        const players = bettingRound.players();
+        expect(players.length).toBe(4);
+        expect(players[0]).toBeInstanceOf(Player);
+        expect(players[0]?.totalChips()).toBe(100);
+        expect(players[0]?.betSize()).toBe(20);
+        expect(players[1]).toBeInstanceOf(Player);
+        expect(players[1]?.totalChips()).toBe(200);
+        expect(players[1]?.betSize()).toBe(0);
+        expect(players[2]).toBeNull();
+        expect(players[3]).toBeInstanceOf(Player);
+        expect(players[3]?.totalChips()).toBe(300);
+        expect(players[3]?.betSize()).toBe(0);
+    });
+});

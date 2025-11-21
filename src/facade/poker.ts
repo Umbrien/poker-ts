@@ -72,10 +72,20 @@ const stringToAutomaticActionFlag = (automaticAction: AutomaticAction): Automati
 
 type PokerState = {
     _table: ReturnType<Table['toJSON']>
+    _forcedBets: ReturnType<Poker['forcedBets']>
+    _numSeats: ReturnType<Poker['numSeats']>
 }
 
 export default class Poker implements Serializable<PokerState> {
     private _table: Table
+
+    static fromJSON(json: PokerState): Poker {
+        const { ante, bigBlind, smallBlind } = json._forcedBets;
+        const poker = new Poker({ ante, bigBlind, smallBlind }, json._numSeats);
+        // The constructor creates a new Table instance, so we need to replace it with the deserialized one.
+        (poker as any)._table = Table.fromJSON(json._table);
+        return poker;
+    }
 
     constructor(forcedBets: { ante?: number, bigBlind: number, smallBlind: number }, numSeats?: number) {
         const { ante, bigBlind: big, smallBlind: small } = forcedBets
@@ -232,6 +242,8 @@ export default class Poker implements Serializable<PokerState> {
 
     toJSON(): PokerState {
         return {
+            _forcedBets: this.forcedBets(),
+            _numSeats: this.numSeats(),
             _table: this._table.toJSON(),
         }
     }

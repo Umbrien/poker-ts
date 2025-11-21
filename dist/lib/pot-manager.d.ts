@@ -9,6 +9,7 @@ declare type PotManagerState = {
 export default class PotManager implements Serializable<PotManagerState> {
     private readonly _pots;
     private _aggregateFoldedBets;
+    static fromJSON(json: PotManagerState): PotManager;
     constructor();
     pots(): Pot[];
     betFolded(amount: any): void;

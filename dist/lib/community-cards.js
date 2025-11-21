@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.next = exports.RoundOfBetting = void 0;
 var assert_1 = __importDefault(require("assert"));
+var card_1 = __importDefault(require("./card"));
 var RoundOfBetting;
 (function (RoundOfBetting) {
     RoundOfBetting[RoundOfBetting["PREFLOP"] = 0] = "PREFLOP";
@@ -25,6 +26,11 @@ var CommunityCards = /** @class */ (function () {
     function CommunityCards() {
         this._cards = [];
     }
+    CommunityCards.fromJSON = function (json) {
+        var communityCards = new CommunityCards();
+        communityCards._cards = json._cards.map(function (cardState) { return card_1.default.fromJSON(cardState); });
+        return communityCards;
+    };
     CommunityCards.prototype.cards = function () {
         return this._cards;
     };

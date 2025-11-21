@@ -654,4 +654,50 @@ describe('Table', () => {
             expect(table.bettingRoundInProgress()).toBeFalsy()
         })
     })
-})
+
+    test('toJSON should serialize the table correctly', () => {
+        const table = new Table({ blinds: { big: 50, small: 25 } });
+        table.sitDown(0, 1000);
+        table.sitDown(1, 2000);
+        table.startHand(); // This will set up _deck, _communityCards, _dealer, etc.
+
+        const json = table.toJSON();
+
+        expect(json).toHaveProperty('_numSeats', 9);
+        expect(json).toHaveProperty('_tablePlayers');
+        expect(Array.isArray(json._tablePlayers)).toBe(true);
+        expect(json._tablePlayers[0]).toEqual({ _total: 1000, _betSize: 25 });
+        expect(json._tablePlayers[1]).toEqual({ _total: 2000, _betSize: 50 }); // Big blind
+        expect(json).toHaveProperty('_deck');
+        expect(json).toHaveProperty('_handPlayers');
+        expect(Array.isArray(json._handPlayers)).toBe(true);
+        expect(json).toHaveProperty('_automaticActions');
+        expect(json).toHaveProperty('_firstTimeButton', false);
+        expect(json).toHaveProperty('_buttonSetManually', false);
+        expect(json).toHaveProperty('_button', 0);
+        expect(json).toHaveProperty('_forcedBets');
+        expect(json).toHaveProperty('_communityCards');
+        expect(json).toHaveProperty('_dealer');
+        expect(json).toHaveProperty('_staged');
+        expect(Array.isArray(json._staged)).toBe(true);
+    });
+
+    test('fromJSON should deserialize the table correctly', () => {
+        const originalTable = new Table({ blinds: { big: 50, small: 25 } });
+        originalTable.sitDown(0, 1000);
+        originalTable.sitDown(1, 2000);
+        originalTable.startHand(); // This sets up a complex state for serialization
+
+        const tableState = originalTable.toJSON();
+        const newTable = Table.fromJSON(tableState);
+
+        expect(newTable).toBeInstanceOf(Table);
+        expect(newTable.numSeats()).toBe(originalTable.numSeats());
+        expect(newTable.forcedBets()).toEqual(originalTable.forcedBets());
+        expect(newTable.button()).toBe(originalTable.button());
+        expect(newTable.handInProgress()).toBe(originalTable.handInProgress());
+
+        // Deep comparison of the entire state through toJSON
+        expect(newTable.toJSON()).toEqual(tableState);
+    });
+});

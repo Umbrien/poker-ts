@@ -20,6 +20,11 @@ var Player = /** @class */ (function () {
             throw new Error('Invalid argument');
         }
     }
+    Player.fromJSON = function (json) {
+        var player = new Player(json._total);
+        player._betSize = json._betSize;
+        return player;
+    };
     Player.prototype.stack = function () {
         return this._total - this._betSize;
     };

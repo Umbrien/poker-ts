@@ -12,6 +12,12 @@ export default class Player implements Serializable<PlayerState> {
     private _total: Chips = 0
     private _betSize: Chips = 0
 
+    static fromJSON(json: PlayerState): Player {
+        const player = new Player(json._total);
+        player._betSize = json._betSize;
+        return player;
+    }
+
     constructor(arg: Chips | Player) {
         if (isChips(arg)) {
             this._total = arg

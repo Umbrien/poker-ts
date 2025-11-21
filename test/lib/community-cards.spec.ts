@@ -78,4 +78,35 @@ describe('Community cards', () => {
             expect(communityCards.cards().length).toBe(5)
         })
     })
-})
+
+    test('toJSON should serialize the community cards correctly', () => {
+        communityCards.deal([new Card(CardRank.A, CardSuit.SPADES), new Card(CardRank.K, CardSuit.HEARTS)]);
+        const json = communityCards.toJSON();
+
+        expect(json).toEqual({
+            _cards: [
+                { rank: CardRank.A, suit: CardSuit.SPADES },
+                { rank: CardRank.K, suit: CardSuit.HEARTS },
+            ],
+        });
+    });
+
+    test('fromJSON should deserialize the community cards correctly', () => {
+        const communityCardsState = {
+            _cards: [
+                { rank: CardRank.Q, suit: CardSuit.CLUBS },
+                { rank: CardRank.J, suit: CardSuit.DIAMONDS },
+            ],
+        };
+        const newCommunityCards = CommunityCards.fromJSON(communityCardsState);
+
+        expect(newCommunityCards).toBeInstanceOf(CommunityCards);
+        expect(newCommunityCards.cards().length).toBe(2);
+        expect(newCommunityCards.cards()[0]).toBeInstanceOf(Card);
+        expect(newCommunityCards.cards()[0].rank).toBe(CardRank.Q);
+        expect(newCommunityCards.cards()[0].suit).toBe(CardSuit.CLUBS);
+        expect(newCommunityCards.cards()[1]).toBeInstanceOf(Card);
+        expect(newCommunityCards.cards()[1].rank).toBe(CardRank.J);
+        expect(newCommunityCards.cards()[1].suit).toBe(CardSuit.DIAMONDS);
+    });
+});

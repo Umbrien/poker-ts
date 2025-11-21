@@ -24,6 +24,12 @@ type CommunityCardsState = {
 export default class CommunityCards implements Serializable<CommunityCardsState> {
     private _cards: Card[] = []
 
+    static fromJSON(json: CommunityCardsState): CommunityCards {
+        const communityCards = new CommunityCards();
+        communityCards._cards = json._cards.map(cardState => Card.fromJSON(cardState));
+        return communityCards;
+    }
+
     cards(): Card[] {
         return this._cards
     }

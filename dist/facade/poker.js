@@ -88,6 +88,13 @@ var Poker = /** @class */ (function () {
         var ante = forcedBets.ante, big = forcedBets.bigBlind, small = forcedBets.smallBlind;
         this._table = new table_1.default({ ante: ante, blinds: { big: big, small: small } }, numSeats);
     }
+    Poker.fromJSON = function (json) {
+        var _a = json._forcedBets, ante = _a.ante, bigBlind = _a.bigBlind, smallBlind = _a.smallBlind;
+        var poker = new Poker({ ante: ante, bigBlind: bigBlind, smallBlind: smallBlind }, json._numSeats);
+        // The constructor creates a new Table instance, so we need to replace it with the deserialized one.
+        poker._table = table_1.default.fromJSON(json._table);
+        return poker;
+    };
     Poker.prototype.playerToAct = function () {
         return this._table.playerToAct();
     };
@@ -210,6 +217,8 @@ var Poker = /** @class */ (function () {
     };
     Poker.prototype.toJSON = function () {
         return {
+            _forcedBets: this.forcedBets(),
+            _numSeats: this.numSeats(),
             _table: this._table.toJSON(),
         };
     };

@@ -51,6 +51,10 @@ var Hand = /** @class */ (function () {
         this._ranking = ranking;
         this._strength = strength;
     }
+    Hand.fromJSON = function (json) {
+        var cards = json._cards.map(function (cardState) { return card_1.default.fromJSON(cardState); });
+        return new Hand(json._ranking, json._strength, cards);
+    };
     Hand.create = function (holeCards, communityCards) {
         assert_1.default(communityCards.cards().length === 5, 'All community cards must be dealt');
         var cards = __spreadArray(__spreadArray([], holeCards), communityCards.cards());

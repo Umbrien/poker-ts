@@ -7,6 +7,7 @@ declare type PlayerState = {
 export default class Player implements Serializable<PlayerState> {
     private _total;
     private _betSize;
+    static fromJSON(json: PlayerState): Player;
     constructor(arg: Chips | Player);
     stack(): Chips;
     betSize(): Chips;

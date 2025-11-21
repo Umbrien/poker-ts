@@ -1,5 +1,5 @@
 import Hand, { HandRanking } from '../../src/lib/hand'
-import Card from '../../src/lib/card'
+import Card, { CardRank, CardSuit } from '../../src/lib/card'
 import { makeCards } from '../helper/card'
 
 describe('Hand', () => {
@@ -182,4 +182,45 @@ describe('Hand', () => {
             }
         })
     })
-})
+
+    test('toJSON should serialize the hand correctly', () => {
+        const cards = makeCards('Ac Kc Qc Jc Tc');
+        const hand = new Hand(HandRanking.STRAIGHT_FLUSH, 0, cards);
+        const json = hand.toJSON();
+
+        expect(json).toEqual({
+            _ranking: HandRanking.STRAIGHT_FLUSH,
+            _strength: 0,
+            _cards: [
+                { rank: CardRank.A, suit: CardSuit.CLUBS },
+                { rank: CardRank.K, suit: CardSuit.CLUBS },
+                { rank: CardRank.Q, suit: CardSuit.CLUBS },
+                { rank: CardRank.J, suit: CardSuit.CLUBS },
+                { rank: CardRank.T, suit: CardSuit.CLUBS },
+            ],
+        });
+    });
+
+    test('fromJSON should deserialize the hand correctly', () => {
+        const handState = {
+            _ranking: HandRanking.FULL_HOUSE,
+            _strength: 100,
+            _cards: [
+                { rank: CardRank.A, suit: CardSuit.SPADES },
+                { rank: CardRank.A, suit: CardSuit.HEARTS },
+                { rank: CardRank.A, suit: CardSuit.DIAMONDS },
+                { rank: CardRank.K, suit: CardSuit.CLUBS },
+                { rank: CardRank.K, suit: CardSuit.SPADES },
+            ],
+        };
+        const hand = Hand.fromJSON(handState);
+
+        expect(hand).toBeInstanceOf(Hand);
+        expect(hand.ranking()).toBe(HandRanking.FULL_HOUSE);
+        expect(hand.strength()).toBe(100);
+        expect(hand.cards().length).toBe(5);
+        expect(hand.cards()[0]).toBeInstanceOf(Card);
+        expect(hand.cards()[0].rank).toBe(CardRank.A);
+        expect(hand.cards()[0].suit).toBe(CardSuit.SPADES);
+    });
+});

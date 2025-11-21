@@ -41,4 +41,32 @@ describe('Pot', () => {
         pot.collectBetsFrom(players)
         expect(pot.eligiblePlayers().length).toBe(1)
     })
-})
+
+    test('toJSON should serialize the pot correctly', () => {
+        const pot = new Pot();
+        pot.add(100);
+        // Simulate some eligible players for a realistic scenario
+        // In a real scenario, eligible players are determined by collectBetsFrom
+        // For testing toJSON, we manually set them
+        (pot as any)._eligiblePlayers = [0, 2]; 
+
+        const json = pot.toJSON();
+
+        expect(json).toEqual({
+            _eligiblePlayers: [0, 2],
+            _size: 100,
+        });
+    });
+
+    test('fromJSON should deserialize the pot correctly', () => {
+        const potState = {
+            _eligiblePlayers: [1, 3, 5],
+            _size: 250,
+        };
+        const pot = Pot.fromJSON(potState);
+
+        expect(pot).toBeInstanceOf(Pot);
+        expect(pot.size()).toBe(250);
+        expect(pot.eligiblePlayers()).toEqual([1, 3, 5]);
+    });
+});

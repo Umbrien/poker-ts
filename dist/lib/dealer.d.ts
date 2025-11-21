@@ -38,7 +38,7 @@ declare type DealerState = {
     _roundOfBetting: RoundOfBetting;
     _bettingRoundsCompleted: boolean;
     _potManager: ReturnType<PotManager['toJSON']>;
-    _winners: [SeatIndex, ReturnType<Hand['toJSON']>, ReturnType<Card['toJSON']>[]][][];
+    _winners: [SeatIndex, ReturnType<Hand['toJSON']>, [ReturnType<Card['toJSON']>, ReturnType<Card['toJSON']>]][][];
 };
 export default class Dealer implements Serializable<DealerState> {
     private readonly _button;
@@ -53,7 +53,8 @@ export default class Dealer implements Serializable<DealerState> {
     private _bettingRoundsCompleted;
     private _potManager;
     private _winners;
-    constructor(players: SeatArray, button: SeatIndex, forcedBets: ForcedBets, deck: Deck, communityCards: CommunityCards, numSeats?: number);
+    static fromJSON(json: DealerState): Dealer;
+    constructor(players: SeatArray, button: SeatIndex, forcedBets: ForcedBets, deck: Deck, communityCards: CommunityCards, numSeats?: number, deserializing?: boolean);
     static isValid(action: Action): boolean;
     static isAggressive(action: Action): boolean;
     handInProgress(): boolean;

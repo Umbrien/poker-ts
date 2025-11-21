@@ -20,6 +20,10 @@ export default class Card implements Serializable<CardState> {
         return c2.rank - c1.rank
     }
 
+    static fromJSON(json: CardState): Card {
+        return new Card(json.rank, json.suit);
+    }
+
     constructor(rank: CardRank, suit: CardSuit) {
         this.rank = rank;
         this.suit = suit;

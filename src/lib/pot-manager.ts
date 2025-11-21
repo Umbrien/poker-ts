@@ -12,6 +12,13 @@ export default class PotManager implements Serializable<PotManagerState> {
     private readonly _pots: Pot[]
     private _aggregateFoldedBets: Chips = 0
 
+    static fromJSON(json: PotManagerState): PotManager {
+        const potManager = new PotManager();
+        (potManager._pots as Pot[]) = json._pots.map(potState => Pot.fromJSON(potState));
+        potManager._aggregateFoldedBets = json._aggregateFoldedBets;
+        return potManager;
+    }
+
     constructor() {
         this._pots = [new Pot()]
     }

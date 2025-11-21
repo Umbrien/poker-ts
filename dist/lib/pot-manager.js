@@ -9,6 +9,12 @@ var PotManager = /** @class */ (function () {
         this._aggregateFoldedBets = 0;
         this._pots = [new pot_1.default()];
     }
+    PotManager.fromJSON = function (json) {
+        var potManager = new PotManager();
+        potManager._pots = json._pots.map(function (potState) { return pot_1.default.fromJSON(potState); });
+        potManager._aggregateFoldedBets = json._aggregateFoldedBets;
+        return potManager;
+    };
     PotManager.prototype.pots = function () {
         return this._pots;
     };

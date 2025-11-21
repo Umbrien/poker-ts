@@ -28,6 +28,7 @@ export default class Card implements Serializable<CardState> {
     rank: CardRank;
     suit: CardSuit;
     static compare(c1: Card, c2: Card): number;
+    static fromJSON(json: CardState): Card;
     constructor(rank: CardRank, suit: CardSuit);
     toJSON(): CardState;
 }

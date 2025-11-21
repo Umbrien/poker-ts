@@ -9,6 +9,7 @@ declare type PotState = {
 export default class Pot implements Serializable<PotState> {
     private _eligiblePlayers;
     private _size;
+    static fromJSON(json: PotState): Pot;
     size(): Chips;
     eligiblePlayers(): SeatIndex[];
     add(amount: Chips): void;

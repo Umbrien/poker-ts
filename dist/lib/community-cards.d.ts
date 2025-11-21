@@ -12,6 +12,7 @@ declare type CommunityCardsState = {
 };
 export default class CommunityCards implements Serializable<CommunityCardsState> {
     private _cards;
+    static fromJSON(json: CommunityCardsState): CommunityCards;
     cards(): Card[];
     deal(cards: Card[]): void;
     toJSON(): CommunityCardsState;

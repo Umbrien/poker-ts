@@ -34,6 +34,11 @@ export default class Hand implements Serializable<HandState> {
     private readonly _strength: number
     private readonly _cards: Card[] /* size 5 */
 
+    static fromJSON(json: HandState): Hand {
+        const cards = json._cards.map(cardState => Card.fromJSON(cardState));
+        return new Hand(json._ranking, json._strength, cards);
+    }
+
     constructor(ranking: HandRanking, strength: number, cards: Card[]) {
         assert(cards.length === 5)
 

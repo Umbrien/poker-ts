@@ -20,6 +20,7 @@ export default class Round implements Serializable<RoundState> {
     private _contested;
     private _firstAction;
     private _numActivePlayers;
+    static fromJSON(json: RoundState): Round;
     constructor(activePlayers: boolean[], firstToAct: SeatIndex);
     activePlayers(): boolean[];
     playerToAct(): SeatIndex;

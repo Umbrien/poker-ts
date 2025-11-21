@@ -11,9 +11,12 @@ export declare type AutomaticAction = 'fold' | 'check/fold' | 'check' | 'call' |
 export declare type Action = 'fold' | 'check' | 'call' | 'bet' | 'raise';
 declare type PokerState = {
     _table: ReturnType<Table['toJSON']>;
+    _forcedBets: ReturnType<Poker['forcedBets']>;
+    _numSeats: ReturnType<Poker['numSeats']>;
 };
 export default class Poker implements Serializable<PokerState> {
     private _table;
+    static fromJSON(json: PokerState): Poker;
     constructor(forcedBets: {
         ante?: number;
         bigBlind: number;

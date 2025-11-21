@@ -28,12 +28,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Action = exports.ActionRange = void 0;
-var community_cards_1 = require("./community-cards");
+var deck_1 = __importDefault(require("./deck"));
+var community_cards_1 = __importStar(require("./community-cards"));
 var betting_round_1 = __importStar(require("./betting-round"));
 var pot_manager_1 = __importDefault(require("./pot-manager"));
 var assert_1 = __importDefault(require("assert"));
 var hand_1 = __importDefault(require("./hand"));
 var array_1 = require("../util/array");
+var card_1 = __importDefault(require("./card"));
+var player_1 = __importDefault(require("./player"));
 var ActionRange = /** @class */ (function () {
     function ActionRange(chipRange) {
         this.action = Action.FOLD; // You can always fold
@@ -59,8 +62,9 @@ var Action;
     Action[Action["RAISE"] = 16] = "RAISE";
 })(Action = exports.Action || (exports.Action = {}));
 var Dealer = /** @class */ (function () {
-    function Dealer(players, button, forcedBets, deck, communityCards, numSeats) {
+    function Dealer(players, button, forcedBets, deck, communityCards, numSeats, deserializing) {
         if (numSeats === void 0) { numSeats = 9; }
+        if (deserializing === void 0) { deserializing = false; }
         this._button = 0;
         this._bettingRound = null;
         this._handInProgress = false;
@@ -74,9 +78,32 @@ var Dealer = /** @class */ (function () {
         this._potManager = new pot_manager_1.default();
         this._holeCards = new Array(numSeats).fill(null);
         this._winners = [];
-        assert_1.default(deck.length === 52, 'Deck must be whole');
-        assert_1.default(communityCards.cards().length === 0, 'No community cards should have been dealt');
+        if (!deserializing) {
+            assert_1.default(deck.length === 52, 'Deck must be whole');
+            assert_1.default(communityCards.cards().length === 0, 'No community cards should have been dealt');
+        }
     }
+    Dealer.fromJSON = function (json) {
+        var players = json._players.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        var deck = deck_1.default.fromJSON(json._deck);
+        var communityCards = community_cards_1.default.fromJSON(json._communityCards);
+        var dealer = new Dealer(players, json._button, json._forcedBets, deck, communityCards, json._holeCards.length, true);
+        dealer._holeCards = json._holeCards.map(function (holeCardsState) {
+            return holeCardsState ? holeCardsState.map(function (cardState) { return card_1.default.fromJSON(cardState); }) : null;
+        });
+        dealer._bettingRound = json._bettingRound ? betting_round_1.default.fromJSON(json._bettingRound) : null;
+        dealer._handInProgress = json._handInProgress;
+        dealer._roundOfBetting = json._roundOfBetting;
+        dealer._bettingRoundsCompleted = json._bettingRoundsCompleted;
+        dealer._potManager = pot_manager_1.default.fromJSON(json._potManager);
+        dealer._winners = json._winners.map(function (potWinners) {
+            return potWinners.map(function (_a) {
+                var seatIndex = _a[0], handState = _a[1], holeCardsStates = _a[2];
+                return [seatIndex, hand_1.default.fromJSON(handState), [card_1.default.fromJSON(holeCardsStates[0]), card_1.default.fromJSON(holeCardsStates[1])]];
+            });
+        });
+        return dealer;
+    };
     Dealer.isValid = function (action) {
         // Method for counting bits in a 32-bit integer from https://graphics.stanford.edu/~seander/bithacks.html
         action = action - ((action >> 1) & 0x55555555);

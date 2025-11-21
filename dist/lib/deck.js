@@ -59,6 +59,12 @@ var Deck = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Deck.fromJSON = function (json) {
+        var deck = new Deck();
+        deck.length = 0; // Clear the initial shuffled deck
+        json.forEach(function (cardState) { return deck.push(card_1.default.fromJSON(cardState)); });
+        return deck;
+    };
     Deck.prototype.fillAndShuffle = function () {
         // Reset the array
         this.length = 0;

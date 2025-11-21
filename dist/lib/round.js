@@ -22,6 +22,16 @@ var Round = /** @class */ (function () {
         this._numActivePlayers = activePlayers.filter(function (player) { return !!player; }).length;
         assert_1.default(firstToAct < activePlayers.length);
     }
+    Round.fromJSON = function (json) {
+        var round = new Round(json._activePlayers, json._playerToAct);
+        round._activePlayers = json._activePlayers;
+        round._playerToAct = json._playerToAct;
+        round._lastAggressiveActor = json._lastAggressiveActor;
+        round._contested = json._contested;
+        round._firstAction = json._firstAction;
+        round._numActivePlayers = json._numActivePlayers;
+        return round;
+    };
     Round.prototype.activePlayers = function () {
         return this._activePlayers;
     };

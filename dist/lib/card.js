@@ -36,6 +36,9 @@ var Card = /** @class */ (function () {
         }
         return c2.rank - c1.rank;
     };
+    Card.fromJSON = function (json) {
+        return new Card(json.rank, json.suit);
+    };
     Card.prototype.toJSON = function () {
         return {
             rank: this.rank,

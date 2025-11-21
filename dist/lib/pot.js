@@ -9,6 +9,12 @@ var Pot = /** @class */ (function () {
         this._eligiblePlayers = [];
         this._size = 0;
     }
+    Pot.fromJSON = function (json) {
+        var pot = new Pot();
+        pot._eligiblePlayers = json._eligiblePlayers;
+        pot._size = json._size;
+        return pot;
+    };
     Pot.prototype.size = function () {
         return this._size;
     };

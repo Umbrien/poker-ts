@@ -25,6 +25,17 @@ export default class Round implements Serializable<RoundState> {
     private _firstAction: boolean = true;
     private _numActivePlayers: number = 0;
 
+    static fromJSON(json: RoundState): Round {
+        const round = new Round(json._activePlayers, json._playerToAct);
+        (round._activePlayers as boolean[]) = json._activePlayers;
+        round._playerToAct = json._playerToAct;
+        round._lastAggressiveActor = json._lastAggressiveActor;
+        round._contested = json._contested;
+        round._firstAction = json._firstAction;
+        round._numActivePlayers = json._numActivePlayers;
+        return round;
+    }
+
     constructor(activePlayers: boolean[], firstToAct: SeatIndex) {
         this._activePlayers = activePlayers
         this._playerToAct = firstToAct;

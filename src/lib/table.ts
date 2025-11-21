@@ -51,6 +51,24 @@ export default class Table implements Serializable<TableState> {
     private _dealer?: Dealer
     private _staged: boolean[] // All players who took a seat or stood up before the .start_hand()
 
+    static fromJSON(json: TableState): Table {
+        const table = new Table(json._forcedBets, json._numSeats);
+
+        (table._tablePlayers as (Player | null)[]) = json._tablePlayers.map(playerState => playerState ? Player.fromJSON(playerState) : null);
+        (table._deck as Deck) = Deck.fromJSON(json._deck);
+        table._handPlayers = json._handPlayers?.map(playerState => playerState ? Player.fromJSON(playerState) : null);
+        table._automaticActions = json._automaticActions;
+        table._firstTimeButton = json._firstTimeButton;
+        table._buttonSetManually = json._buttonSetManually;
+        table._button = json._button;
+        table._forcedBets = json._forcedBets;
+        table._communityCards = json._communityCards ? CommunityCards.fromJSON(json._communityCards) : undefined;
+        table._dealer = json._dealer ? Dealer.fromJSON(json._dealer) : undefined;
+        (table._staged as boolean[]) = json._staged; // Cast needed because _staged is readonly private
+
+        return table;
+    }
+
     constructor(forcedBets: ForcedBets, numSeats = 9) {
         assert(numSeats <= 23, 'Maximum 23 players')
 

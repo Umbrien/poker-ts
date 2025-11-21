@@ -14,6 +14,13 @@ export default class Pot implements Serializable<PotState> {
     private _eligiblePlayers: SeatIndex[] = []
     private _size: Chips = 0
 
+    static fromJSON(json: PotState): Pot {
+        const pot = new Pot();
+        pot._eligiblePlayers = json._eligiblePlayers;
+        pot._size = json._size;
+        return pot;
+    }
+
     size(): Chips {
         return this._size
     }

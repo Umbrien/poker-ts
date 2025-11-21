@@ -27,6 +27,7 @@ export default class Hand implements Serializable<HandState> {
     private readonly _ranking;
     private readonly _strength;
     private readonly _cards;
+    static fromJSON(json: HandState): Hand;
     constructor(ranking: HandRanking, strength: number, cards: Card[]);
     static create(holeCards: HoleCards, communityCards: CommunityCards): Hand;
     static of(cards: Card[]): Hand;

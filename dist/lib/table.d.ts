@@ -45,6 +45,7 @@ export default class Table implements Serializable<TableState> {
     private _communityCards?;
     private _dealer?;
     private _staged;
+    static fromJSON(json: TableState): Table;
     constructor(forcedBets: ForcedBets, numSeats?: number);
     playerToAct(): SeatIndex;
     button(): SeatIndex;

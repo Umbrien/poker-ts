@@ -12,6 +12,13 @@ export default class Deck extends Array<Card> implements Serializable<DeckState>
         return Array;
     }
 
+    static fromJSON(json: DeckState): Deck {
+        const deck = new Deck();
+        deck.length = 0; // Clear the initial shuffled deck
+        json.forEach(cardState => deck.push(Card.fromJSON(cardState)));
+        return deck;
+    }
+
     constructor(shuffleAlgorithm: (array: Card[]) => void = shuffle) {
         super()
 

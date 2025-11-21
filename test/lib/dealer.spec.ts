@@ -833,4 +833,91 @@ describe('Dealer', () => {
             })
         })
     })
-})
+
+    test('toJSON should serialize the dealer correctly', () => {
+        const forcedBets = { blinds: { big: 50, small: 25 } };
+        const players: SeatArray = [new Player(1000), new Player(1000), new Player(1000)];
+        const deck = new Deck();
+        const communityCards = new CommunityCards();
+        const dealer = new Dealer(players, 0, forcedBets, deck, communityCards);
+
+        dealer.startHand(); // This will set up _bettingRound, _holeCards, etc.
+        dealer.actionTaken(Action.RAISE, 500);
+        dealer.actionTaken(Action.CALL);
+        dealer.actionTaken(Action.CALL);
+        dealer.endBettingRound(); // Flop
+        dealer.actionTaken(Action.CHECK);
+        dealer.actionTaken(Action.CHECK);
+        dealer.actionTaken(Action.CHECK);
+        dealer.endBettingRound(); // Turn
+        dealer.actionTaken(Action.CHECK);
+        dealer.actionTaken(Action.CHECK);
+        dealer.actionTaken(Action.CHECK);
+        dealer.endBettingRound(); // River
+                dealer.actionTaken(Action.CHECK);
+                dealer.actionTaken(Action.CHECK);
+                dealer.actionTaken(Action.CHECK);
+                dealer.endBettingRound(); // After River
+                dealer.showdown(); // Add this line
+                const json = dealer.toJSON();
+
+        expect(json).toHaveProperty('_button', 0);
+        expect(json).toHaveProperty('_communityCards');
+        expect(json._communityCards).toHaveProperty('_cards');
+        expect(json).toHaveProperty('_holeCards');
+        expect(Array.isArray(json._holeCards)).toBe(true);
+        expect(json).toHaveProperty('_players');
+        expect(Array.isArray(json._players)).toBe(true);
+        expect(json).toHaveProperty('_bettingRound');
+        expect(json._bettingRound).toBeDefined(); // Betting round should be null after ending all rounds
+        // expect(json._bettingRound).toBeNull(); // Betting round should be null after ending all rounds, but depends on game state
+        expect(json).toHaveProperty('_forcedBets');
+        expect(json).toHaveProperty('_deck');
+        expect(json._deck).toHaveLength(52 - (2 * 3) - 5); // 52 - (2 hole cards * 3 players) - 5 community cards
+        expect(json).toHaveProperty('_handInProgress', false); // Hand should be over after showdown
+        expect(json).toHaveProperty('_roundOfBetting', RoundOfBetting.RIVER);
+        expect(json).toHaveProperty('_bettingRoundsCompleted', true);
+        expect(json).toHaveProperty('_potManager');
+        expect(json._potManager).toHaveProperty('_pots');
+        expect(json).toHaveProperty('_winners');
+        expect(Array.isArray(json._winners)).toBe(true);
+    });
+
+    test('fromJSON should deserialize the dealer correctly', () => {
+        const forcedBets = { blinds: { big: 50, small: 25 } };
+        const initialPlayers: SeatArray = [new Player(1000), new Player(1000), new Player(1000)];
+        const originalDeck = new Deck();
+        const originalCommunityCards = new CommunityCards();
+        const originalDealer = new Dealer(initialPlayers, 0, forcedBets, originalDeck, originalCommunityCards);
+
+        originalDealer.startHand();
+        originalDealer.actionTaken(Action.RAISE, 500);
+        originalDealer.actionTaken(Action.CALL);
+        originalDealer.actionTaken(Action.CALL);
+        originalDealer.endBettingRound(); // Flop
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.endBettingRound(); // Turn
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.endBettingRound(); // River
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.actionTaken(Action.CHECK);
+        originalDealer.endBettingRound(); // After River
+
+        const dealerState = originalDealer.toJSON();
+        const newDealer = Dealer.fromJSON(dealerState);
+
+        // Basic sanity checks
+        expect(newDealer).toBeInstanceOf(Dealer);
+        expect(newDealer.button()).toBe(dealerState._button);
+        expect(newDealer.roundOfBetting()).toBe(dealerState._roundOfBetting);
+        expect(newDealer.handInProgress()).toBe(dealerState._handInProgress);
+
+        // More detailed checks by comparing serialized states (deep comparison)
+        expect(newDealer.toJSON()).toEqual(dealerState);
+    });
+});

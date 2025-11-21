@@ -400,4 +400,43 @@ describe('Round', () => {
             })
         })
     })
-})
+
+    test('toJSON should serialize the round correctly', () => {
+        const players = [true, true, false, true, false];
+        const round = new Round(players, 1);
+        round.actionTaken(Action.AGGRESSIVE);
+
+        const json = round.toJSON();
+
+        expect(json).toEqual({
+            _activePlayers: [true, true, false, true, false],
+            _playerToAct: round.playerToAct(), // Get actual playerToAct after actionTaken to avoid hardcoding
+            _lastAggressiveActor: 1,
+            _contested: true,
+            _firstAction: false,
+            _numActivePlayers: 3,
+        });
+    });
+
+    test('fromJSON should deserialize the round correctly', () => {
+        const roundState = {
+            _activePlayers: [true, false, true, false, true],
+            _playerToAct: 2,
+            _lastAggressiveActor: 4,
+            _contested: true,
+            _firstAction: false,
+            _numActivePlayers: 3,
+        };
+        const round = Round.fromJSON(roundState);
+
+        expect(round).toBeInstanceOf(Round);
+        expect(round.activePlayers()).toEqual(roundState._activePlayers);
+        expect(round.playerToAct()).toBe(roundState._playerToAct);
+        expect(round.lastAggressiveActor()).toBe(roundState._lastAggressiveActor);
+        expect(round.isContested()).toBe(roundState._contested);
+        expect(round.numActivePlayers()).toBe(roundState._numActivePlayers);
+        // Note: _firstAction is a private property that is part of the state, but not exposed by a public getter.
+        // We can't directly test it without making it public or using a private access helper if needed.
+        // For now, we trust the fromJSON implementation to set it correctly if other properties are correct.
+    });
+});

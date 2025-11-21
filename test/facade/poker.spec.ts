@@ -292,4 +292,91 @@ describe('Poker facade', () => {
             })
         })
     })
+
+    describe('toJSON', () => {
+        beforeEach(() => {
+            poker = new Poker({ smallBlind: 50, bigBlind: 100 })
+            poker.sitDown(0, 2000)
+            poker.sitDown(1, 2000)
+            poker.sitDown(2, 2000)
+            poker.startHand()
+            poker.actionTaken('call')
+            poker.actionTaken('call')
+            poker.actionTaken('check')
+            poker.endBettingRound() // Flop
+        })
+
+        test('should return a serializable object with expected properties', () => {
+            const json = poker.toJSON()
+
+            // Verify top-level properties
+            expect(typeof json).toBe('object')
+            expect(json).toHaveProperty('_forcedBets')
+            expect(json).toHaveProperty('_numSeats')
+            expect(json).toHaveProperty('_table')
+
+            // Verify _forcedBets structure
+            expect(typeof json._forcedBets).toBe('object')
+            expect(json._forcedBets).toHaveProperty('ante', 0)
+            expect(json._forcedBets).toHaveProperty('smallBlind', 50)
+            expect(json._forcedBets).toHaveProperty('bigBlind', 100)
+
+            // Verify _numSeats
+            expect(json._numSeats).toBe(9)
+
+            // Verify _table structure (recursive serialization check)
+            expect(typeof json._table).toBe('object')
+            expect(json._table).toHaveProperty('_numSeats', 9)
+            expect(json._table).toHaveProperty('_tablePlayers')
+            expect(Array.isArray(json._table._tablePlayers)).toBe(true)
+            expect(json._table._tablePlayers.length).toBe(9)
+            expect(json._table).toHaveProperty('_deck')
+            expect(Array.isArray(json._table._deck)).toBe(true)
+            expect(json._table).toHaveProperty('_dealer')
+            expect(json._table._dealer).toBeDefined() // Ensure _dealer exists
+            expect(typeof json._table._dealer).toBe('object')
+            expect(json._table).toHaveProperty('_communityCards')
+            expect(typeof json._table._communityCards).toBe('object')
+
+            // Further checks on nested objects within _table._dealer
+            expect(json._table._dealer).toHaveProperty('_bettingRound')
+            expect(json._table._dealer?._bettingRound).toBeDefined() // Ensure _bettingRound exists
+            expect(typeof json._table._dealer?._bettingRound).toBe('object')
+            expect(json._table._dealer?._bettingRound).toHaveProperty('_players')
+            expect(Array.isArray(json._table._dealer?._bettingRound?._players)).toBe(true)
+            expect(json._table._dealer?._bettingRound?._players?.length).toBe(9)
+        })
+
+        test('fromJSON should deserialize the poker facade correctly', () => {
+            // Create a poker instance, perform some actions to build up its state
+            const originalPoker = new Poker({ smallBlind: 50, bigBlind: 100 });
+            originalPoker.sitDown(0, 2000);
+            originalPoker.sitDown(1, 2000);
+            originalPoker.sitDown(2, 2000);
+            originalPoker.startHand();
+            originalPoker.actionTaken('call');
+            originalPoker.actionTaken('call');
+            originalPoker.actionTaken('check');
+            originalPoker.endBettingRound(); // Flop
+
+            // Serialize the original state
+            const pokerState = originalPoker.toJSON();
+
+            // Deserialize to a new instance
+            const newPoker = Poker.fromJSON(pokerState);
+
+            // Assert that the new instance is a Poker object
+            expect(newPoker).toBeInstanceOf(Poker);
+
+            // Assert that the new instance's serialized state matches the original serialized state
+            expect(newPoker.toJSON()).toEqual(pokerState);
+
+            // Further specific assertions to ensure deep correctness if needed
+            expect(newPoker.forcedBets()).toEqual(originalPoker.forcedBets());
+            expect(newPoker.numSeats()).toBe(originalPoker.numSeats());
+            expect(newPoker.seats()).toEqual(originalPoker.seats());
+            expect(newPoker.isHandInProgress()).toBe(originalPoker.isHandInProgress());
+            expect(newPoker.roundOfBetting()).toBe(originalPoker.roundOfBetting());
+        });
+    })
 })

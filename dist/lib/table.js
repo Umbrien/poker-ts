@@ -51,6 +51,22 @@ var Table = /** @class */ (function () {
         this._staged = new Array(numSeats).fill(false);
         this._deck = new deck_1.default();
     }
+    Table.fromJSON = function (json) {
+        var _a;
+        var table = new Table(json._forcedBets, json._numSeats);
+        table._tablePlayers = json._tablePlayers.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        table._deck = deck_1.default.fromJSON(json._deck);
+        table._handPlayers = (_a = json._handPlayers) === null || _a === void 0 ? void 0 : _a.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        table._automaticActions = json._automaticActions;
+        table._firstTimeButton = json._firstTimeButton;
+        table._buttonSetManually = json._buttonSetManually;
+        table._button = json._button;
+        table._forcedBets = json._forcedBets;
+        table._communityCards = json._communityCards ? community_cards_1.default.fromJSON(json._communityCards) : undefined;
+        table._dealer = json._dealer ? dealer_1.default.fromJSON(json._dealer) : undefined;
+        table._staged = json._staged; // Cast needed because _staged is readonly private
+        return table;
+    };
     Table.prototype.playerToAct = function () {
         assert_1.default(this.bettingRoundInProgress(), 'Betting round must be in progress');
         assert_1.default(this._dealer !== undefined);
