@@ -69,11 +69,11 @@ export default class Dealer implements Serializable<DealerState> {
     private _potManager: PotManager
     private _winners: [SeatIndex, Hand, HoleCards][][]
 
-    static fromJSON(json: DealerState): Dealer {
-        const players = json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
-        const deck = Deck.fromJSON(json._deck);
-        const communityCards = CommunityCards.fromJSON(json._communityCards);
-        const dealer = new Dealer(players, json._button, json._forcedBets, deck, communityCards, json._holeCards.length, true);
+    static fromJSON(json: DealerState, players?: SeatArray, deck?: Deck, communityCards?: CommunityCards): Dealer {
+        const dealerPlayers = players ?? json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
+        const dealerDeck = deck ?? Deck.fromJSON(json._deck);
+        const dealerCommunityCards = communityCards ?? CommunityCards.fromJSON(json._communityCards);
+        const dealer = new Dealer(dealerPlayers, json._button, json._forcedBets, dealerDeck, dealerCommunityCards, json._holeCards.length, true);
 
         (dealer._holeCards as (ReturnType<Card['toJSON']>[] | null)[]) = json._holeCards.map(holeCardsState => 
             holeCardsState ? holeCardsState.map(cardState => Card.fromJSON(cardState)) : null

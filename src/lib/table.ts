@@ -63,7 +63,7 @@ export default class Table implements Serializable<TableState> {
         table._button = json._button;
         table._forcedBets = json._forcedBets;
         table._communityCards = json._communityCards ? CommunityCards.fromJSON(json._communityCards) : undefined;
-        table._dealer = json._dealer ? Dealer.fromJSON(json._dealer) : undefined;
+        table._dealer = json._dealer ? Dealer.fromJSON(json._dealer, table._handPlayers, table._deck, table._communityCards) : undefined;
         (table._staged as boolean[]) = json._staged; // Cast needed because _staged is readonly private
 
         return table;
