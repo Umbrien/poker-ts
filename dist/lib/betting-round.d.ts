@@ -26,7 +26,7 @@ export default class BettingRound implements Serializable<BettingRoundState> {
     private _round;
     private _biggestBet;
     private _minRaise;
-    static fromJSON(json: BettingRoundState): BettingRound;
+    static fromJSON(json: BettingRoundState, players?: SeatArray): BettingRound;
     constructor(players: SeatArray, firstToAct: SeatIndex, minRaise: Chips, biggestBet?: Chips);
     inProgress(): boolean;
     isContested(): boolean;

@@ -53,7 +53,7 @@ export default class Dealer implements Serializable<DealerState> {
     private _bettingRoundsCompleted;
     private _potManager;
     private _winners;
-    static fromJSON(json: DealerState, players?: SeatArray, deck?: Deck, communityCards?: CommunityCards): Dealer;
+    static fromJSON(json: DealerState, communityCards?: CommunityCards): Dealer;
     constructor(players: SeatArray, button: SeatIndex, forcedBets: ForcedBets, deck: Deck, communityCards: CommunityCards, numSeats?: number, deserializing?: boolean);
     static isValid(action: Action): boolean;
     static isAggressive(action: Action): boolean;

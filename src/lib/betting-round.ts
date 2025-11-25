@@ -36,15 +36,15 @@ export default class BettingRound implements Serializable<BettingRoundState> {
     private _biggestBet: Chips
     private _minRaise: Chips
 
-    static fromJSON(json: BettingRoundState): BettingRound {
-        const players = json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
+    static fromJSON(json: BettingRoundState, players?: SeatArray): BettingRound {
+        const bettingRoundPlayers = players ?? json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
         const round = Round.fromJSON(json._round);
         // The BettingRound constructor creates a new Round instance internally.
         // We need to pass the initial active players and firstToAct to the constructor,
         // but then replace the internally created _round with our deserialized 'round' instance.
-        const initialActivePlayers = players.map(player => !!player);
+        const initialActivePlayers = bettingRoundPlayers.map(player => !!player);
         // The firstToAct for the constructor should be derived from the deserialized round's playerToAct
-        const bettingRound = new BettingRound(players, round.playerToAct(), json._minRaise, json._biggestBet);
+        const bettingRound = new BettingRound(bettingRoundPlayers, round.playerToAct(), json._minRaise, json._biggestBet);
         (bettingRound as any)._round = round; // Overwrite with the deserialized round
         return bettingRound;
     }

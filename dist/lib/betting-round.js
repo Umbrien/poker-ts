@@ -52,15 +52,15 @@ var BettingRound = /** @class */ (function () {
         assert_1.default(firstToAct < players.length, 'Seat index must be in the valid range');
         assert_1.default(players[firstToAct], 'First player to act must exist');
     }
-    BettingRound.fromJSON = function (json) {
-        var players = json._players.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+    BettingRound.fromJSON = function (json, players) {
+        var bettingRoundPlayers = players !== null && players !== void 0 ? players : json._players.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
         var round = round_1.default.fromJSON(json._round);
         // The BettingRound constructor creates a new Round instance internally.
         // We need to pass the initial active players and firstToAct to the constructor,
         // but then replace the internally created _round with our deserialized 'round' instance.
-        var initialActivePlayers = players.map(function (player) { return !!player; });
+        var initialActivePlayers = bettingRoundPlayers.map(function (player) { return !!player; });
         // The firstToAct for the constructor should be derived from the deserialized round's playerToAct
-        var bettingRound = new BettingRound(players, round.playerToAct(), json._minRaise, json._biggestBet);
+        var bettingRound = new BettingRound(bettingRoundPlayers, round.playerToAct(), json._minRaise, json._biggestBet);
         bettingRound._round = round; // Overwrite with the deserialized round
         return bettingRound;
     };

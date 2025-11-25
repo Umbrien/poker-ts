@@ -83,15 +83,15 @@ var Dealer = /** @class */ (function () {
             assert_1.default(communityCards.cards().length === 0, 'No community cards should have been dealt');
         }
     }
-    Dealer.fromJSON = function (json, players, deck, communityCards) {
-        var dealerPlayers = players !== null && players !== void 0 ? players : json._players.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
-        var dealerDeck = deck !== null && deck !== void 0 ? deck : deck_1.default.fromJSON(json._deck);
+    Dealer.fromJSON = function (json, communityCards) {
+        var dealerPlayers = json._players.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        var dealerDeck = deck_1.default.fromJSON(json._deck);
         var dealerCommunityCards = communityCards !== null && communityCards !== void 0 ? communityCards : community_cards_1.default.fromJSON(json._communityCards);
         var dealer = new Dealer(dealerPlayers, json._button, json._forcedBets, dealerDeck, dealerCommunityCards, json._holeCards.length, true);
         dealer._holeCards = json._holeCards.map(function (holeCardsState) {
             return holeCardsState ? holeCardsState.map(function (cardState) { return card_1.default.fromJSON(cardState); }) : null;
         });
-        dealer._bettingRound = json._bettingRound ? betting_round_1.default.fromJSON(json._bettingRound) : null;
+        dealer._bettingRound = json._bettingRound ? betting_round_1.default.fromJSON(json._bettingRound, dealerPlayers) : null;
         dealer._handInProgress = json._handInProgress;
         dealer._roundOfBetting = json._roundOfBetting;
         dealer._bettingRoundsCompleted = json._bettingRoundsCompleted;

@@ -69,16 +69,16 @@ export default class Dealer implements Serializable<DealerState> {
     private _potManager: PotManager
     private _winners: [SeatIndex, Hand, HoleCards][][]
 
-    static fromJSON(json: DealerState, players?: SeatArray, deck?: Deck, communityCards?: CommunityCards): Dealer {
-        const dealerPlayers = players ?? json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
-        const dealerDeck = deck ?? Deck.fromJSON(json._deck);
+    static fromJSON(json: DealerState, communityCards?: CommunityCards): Dealer {
+        const dealerPlayers = json._players.map(playerState => playerState ? Player.fromJSON(playerState) : null);
+        const dealerDeck = Deck.fromJSON(json._deck);
         const dealerCommunityCards = communityCards ?? CommunityCards.fromJSON(json._communityCards);
         const dealer = new Dealer(dealerPlayers, json._button, json._forcedBets, dealerDeck, dealerCommunityCards, json._holeCards.length, true);
 
         (dealer._holeCards as (ReturnType<Card['toJSON']>[] | null)[]) = json._holeCards.map(holeCardsState => 
             holeCardsState ? holeCardsState.map(cardState => Card.fromJSON(cardState)) : null
         );
-        dealer._bettingRound = json._bettingRound ? BettingRound.fromJSON(json._bettingRound) : null;
+        dealer._bettingRound = json._bettingRound ? BettingRound.fromJSON(json._bettingRound, dealerPlayers) : null;
         dealer._handInProgress = json._handInProgress;
         dealer._roundOfBetting = json._roundOfBetting;
         dealer._bettingRoundsCompleted = json._bettingRoundsCompleted;

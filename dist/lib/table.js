@@ -63,7 +63,7 @@ var Table = /** @class */ (function () {
         table._button = json._button;
         table._forcedBets = json._forcedBets;
         table._communityCards = json._communityCards ? community_cards_1.default.fromJSON(json._communityCards) : undefined;
-        table._dealer = json._dealer ? dealer_1.default.fromJSON(json._dealer, table._handPlayers, table._deck, table._communityCards) : undefined;
+        table._dealer = json._dealer ? dealer_1.default.fromJSON(json._dealer, table._communityCards) : undefined;
         table._staged = json._staged; // Cast needed because _staged is readonly private
         return table;
     };

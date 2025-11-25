@@ -700,4 +700,72 @@ describe('Table', () => {
         // Deep comparison of the entire state through toJSON
         expect(newTable.toJSON()).toEqual(tableState);
     });
+
+    test('fromJSON should properly restore deck state and allow community cards to be dealt', () => {
+        // This test specifically addresses the bug where the dealer's deck
+        // was not properly restored, causing community cards to not be dealt
+        const originalTable = new Table({ blinds: { big: 20, small: 10 } });
+        originalTable.sitDown(3, 2000);
+        originalTable.sitDown(5, 2000);
+        originalTable.startHand();
+
+        // Player 3 checks, Player 5 calls
+        expect(originalTable.playerToAct()).toBe(3);
+        originalTable.actionTaken(Action.CHECK);
+        expect(originalTable.playerToAct()).toBe(5);
+        originalTable.actionTaken(Action.CALL);
+        
+        // Betting round should be over
+        expect(originalTable.bettingRoundInProgress()).toBeFalsy();
+        expect(originalTable.bettingRoundsCompleted()).toBeFalsy();
+        
+        // Serialize the table state
+        const tableState = originalTable.toJSON();
+        
+        // Deserialize to a new table
+        const newTable = Table.fromJSON(tableState);
+        
+        // Verify state was restored correctly
+        expect(newTable.handInProgress()).toBeTruthy();
+        expect(newTable.bettingRoundInProgress()).toBeFalsy();
+        expect(newTable.bettingRoundsCompleted()).toBeFalsy();
+        expect(newTable.roundOfBetting()).toBe(0); // Still preflop
+        expect(newTable.communityCards().cards().length).toBe(0);
+        
+        // This is the critical test: endBettingRound should deal the flop
+        newTable.endBettingRound();
+        
+        // Verify flop was dealt (3 cards)
+        expect(newTable.communityCards().cards().length).toBe(3);
+        expect(newTable.roundOfBetting()).toBe(3); // Flop
+        expect(newTable.bettingRoundInProgress()).toBeTruthy();
+        
+        // Continue to verify the game can progress normally
+        newTable.actionTaken(Action.CHECK);
+        newTable.actionTaken(Action.CHECK);
+        expect(newTable.bettingRoundInProgress()).toBeFalsy();
+        
+        // Deal the turn
+        newTable.endBettingRound();
+        expect(newTable.communityCards().cards().length).toBe(4);
+        expect(newTable.roundOfBetting()).toBe(4); // Turn
+        
+        // Continue through river
+        newTable.actionTaken(Action.CHECK);
+        newTable.actionTaken(Action.CHECK);
+        // End turn betting round, which deals river card
+        newTable.endBettingRound();
+        expect(newTable.communityCards().cards().length).toBe(5);
+        expect(newTable.roundOfBetting()).toBe(5); // River
+        expect(newTable.bettingRoundInProgress()).toBeTruthy(); // River betting is now in progress
+        
+        // Play out river betting round
+        newTable.actionTaken(Action.CHECK);
+        newTable.actionTaken(Action.CHECK);
+        expect(newTable.bettingRoundInProgress()).toBeFalsy();
+        
+        // End river betting round, which completes all betting
+        newTable.endBettingRound();
+        expect(newTable.bettingRoundsCompleted()).toBeTruthy();
+    });
 });
