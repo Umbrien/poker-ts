@@ -91,7 +91,16 @@ var Dealer = /** @class */ (function () {
         dealer._holeCards = json._holeCards.map(function (holeCardsState) {
             return holeCardsState ? holeCardsState.map(function (cardState) { return card_1.default.fromJSON(cardState); }) : null;
         });
-        dealer._bettingRound = json._bettingRound ? betting_round_1.default.fromJSON(json._bettingRound) : null;
+        // Deserialize betting round if it exists
+        if (json._bettingRound) {
+            dealer._bettingRound = betting_round_1.default.fromJSON(json._bettingRound);
+            // CRITICAL: Replace the betting round's player instances with the dealer's player instances
+            // This ensures that when players are modified in the betting round, the changes are reflected in the dealer
+            dealer._bettingRound._players = players;
+        }
+        else {
+            dealer._bettingRound = null;
+        }
         dealer._handInProgress = json._handInProgress;
         dealer._roundOfBetting = json._roundOfBetting;
         dealer._bettingRoundsCompleted = json._bettingRoundsCompleted;
