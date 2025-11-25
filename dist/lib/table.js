@@ -54,17 +54,41 @@ var Table = /** @class */ (function () {
     Table.fromJSON = function (json) {
         var _a;
         var table = new Table(json._forcedBets, json._numSeats);
+        // Deserialize table players
         table._tablePlayers = json._tablePlayers.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        // Deserialize the deck and community cards at the table level
+        // These will be shared with the dealer to maintain reference consistency
         table._deck = deck_1.default.fromJSON(json._deck);
-        table._handPlayers = (_a = json._handPlayers) === null || _a === void 0 ? void 0 : _a.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        table._communityCards = json._communityCards ? community_cards_1.default.fromJSON(json._communityCards) : undefined;
+        // Restore other table state
         table._automaticActions = json._automaticActions;
         table._firstTimeButton = json._firstTimeButton;
         table._buttonSetManually = json._buttonSetManually;
         table._button = json._button;
         table._forcedBets = json._forcedBets;
-        table._communityCards = json._communityCards ? community_cards_1.default.fromJSON(json._communityCards) : undefined;
-        table._dealer = json._dealer ? dealer_1.default.fromJSON(json._dealer) : undefined;
         table._staged = json._staged; // Cast needed because _staged is readonly private
+        // IMPORTANT: If there's a dealer, we need to restore it with references to the SAME
+        // deck and community cards instances that the table has, not create new ones.
+        // This ensures that when the dealer deals cards, the table sees the updates.
+        if (json._dealer && table._communityCards) {
+            // We need to temporarily modify how Dealer.fromJSON works, or we need to
+            // manually restore the dealer's state while injecting the shared references.
+            // For now, we'll deserialize the dealer and then fix up the references.
+            var tempDealer = dealer_1.default.fromJSON(json._dealer);
+            // Now we need to replace the dealer's deck and community cards with the table's instances
+            // This requires accessing private fields, so we'll cast to any temporarily
+            tempDealer._deck = table._deck;
+            tempDealer._communityCards = table._communityCards;
+            table._dealer = tempDealer;
+            // CRITICAL: Also update the table's _handPlayers to reference the dealer's player array
+            // This ensures that when the dealer modifies players, the table sees those changes
+            // The dealer's _players array is the source of truth during a hand
+            table._handPlayers = tempDealer._players;
+        }
+        else {
+            // No dealer, so deserialize handPlayers directly if they exist
+            table._handPlayers = (_a = json._handPlayers) === null || _a === void 0 ? void 0 : _a.map(function (playerState) { return playerState ? player_1.default.fromJSON(playerState) : null; });
+        }
         return table;
     };
     Table.prototype.playerToAct = function () {
