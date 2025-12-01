@@ -84,7 +84,9 @@ export default class Dealer implements Serializable<DealerState> {
             dealer._bettingRound = BettingRound.fromJSON(json._bettingRound);
             // CRITICAL: Replace the betting round's player instances with the dealer's player instances
             // This ensures that when players are modified in the betting round, the changes are reflected in the dealer
-            (dealer._bettingRound as any)._players = players;
+            // We use a shallow copy [...players] so that if Dealer sets a player to null (e.g. on fold),
+            // it doesn't immediately affect BettingRound's array, preventing the "player is null" assertion error.
+            (dealer._bettingRound as any)._players = [...players];
         } else {
             dealer._bettingRound = null;
         }
