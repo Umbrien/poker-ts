@@ -251,12 +251,13 @@ export default class Dealer implements Serializable<DealerState> {
             this._bettingRound.actionTaken(BettingRoundAction.RAISE, bet)
         } else {
             assert(action & Action.FOLD)
-            const foldingPlayer = this._players[this.playerToAct()]
+            const seat = this.playerToAct()
+            const foldingPlayer = this._players[seat]
             assert(foldingPlayer !== null)
             this._potManager.betFolded(foldingPlayer.betSize())
             foldingPlayer.takeFromBet(foldingPlayer.betSize())
-            this._players[this.playerToAct()] = null
             this._bettingRound.actionTaken(BettingRoundAction.LEAVE)
+            this._players[seat] = null
         }
     }
 

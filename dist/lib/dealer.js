@@ -235,12 +235,13 @@ var Dealer = /** @class */ (function () {
         }
         else {
             assert_1.default(action & Action.FOLD);
-            var foldingPlayer = this._players[this.playerToAct()];
+            var seat = this.playerToAct();
+            var foldingPlayer = this._players[seat];
             assert_1.default(foldingPlayer !== null);
             this._potManager.betFolded(foldingPlayer.betSize());
             foldingPlayer.takeFromBet(foldingPlayer.betSize());
-            this._players[this.playerToAct()] = null;
             this._bettingRound.actionTaken(betting_round_1.Action.LEAVE);
+            this._players[seat] = null;
         }
     };
     Dealer.prototype.endBettingRound = function () {
